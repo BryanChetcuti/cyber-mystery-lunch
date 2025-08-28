@@ -1,5 +1,16 @@
-"devDependencies": {
-  "wrangler": "^4.33.0",
-  "typescript": "^5.9.2",
-  "prettier": "^3.6.2"
+{
+  "name": "cyber-mystery-lunch",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev worker/index.ts --site public",
+    "deploy": "wrangler deploy worker/index.ts --minify --site public",
+    "format": "prettier -w .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.33.0"
+  }
 }
