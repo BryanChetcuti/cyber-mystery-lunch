@@ -53,7 +53,7 @@ export class GameRoom implements DurableObject {
         case "current":
           return this.current();
         case "answer":
-          return this.answer(request);
+          return this.answer(request); // ★ hardened below
         case "next":
           return this.next();
         case "scoreboard":
@@ -129,7 +129,8 @@ export class GameRoom implements DurableObject {
   }
 
   private redact(round: any) {
-    // Remove correctness flags so clients can’t peek
+    // Remove correctness flags so clients can’t peek,
+    // but keep points/seconds/ids so host timer works.
     return {
       ...round,
       choices: (round.choices as Choice[]).map((c) => ({ id: c.id, text: c.text })),
@@ -202,12 +203,18 @@ export class GameRoom implements DurableObject {
     });
   }
 
+  // ★ Hardened: normalize IDs and coerce non-boolean "correct" values
   private async answer(request: Request) {
-    const { playerId, choiceId } = (await request.json().catch(() => ({}))) as {
+    const body = (await request.json().catch(() => ({}))) as {
       playerId?: string;
-      choiceId?: string;
+      choiceId?: string | number;
     };
-    if (!playerId || !choiceId) return this.json({ ok: false, error: "Missing playerId or choiceId" }, 400);
+    const playerId = body.playerId;
+    const choiceIdRaw = body.choiceId;
+
+    if (!playerId || choiceIdRaw === undefined || choiceIdRaw === null) {
+      return this.json({ ok: false, error: "Missing playerId or choiceId" }, 400);
+    }
 
     const r = this.currentRound();
     if (!r) return this.json({ ok: false, error: "No active round" }, 400);
@@ -215,18 +222,33 @@ export class GameRoom implements DurableObject {
     const player = this.data!.players[playerId];
     if (!player) return this.json({ ok: false, error: "Unknown player" }, 400);
 
-    // Prevent double answers
+    // Prevent double answers for this round
     if (player.answered![r.id]) {
       return this.json({ ok: true, already: true, score: player.score });
     }
 
-    player.answered![r.id] = choiceId;
+    // Normalize helper (tolerate casing/spacing/number IDs in JSON)
+    const norm = (v: unknown) => String(v).trim().toUpperCase();
+    const choiceId = norm(choiceIdRaw);
 
-    const correct = r.choices.find((c: Choice) => c.id === choiceId)?.correct;
-    if (correct) player.score += r.points;
+    // Find the selected choice robustly
+    const selected = r.choices.find((c: Choice) => norm(c.id) === choiceId);
+
+    // Interpret "correct" that may be boolean/number/string
+    const isTrue = (v: any) =>
+      v === true ||
+      v === 1 ||
+      v === "1" ||
+      (typeof v === "string" && v.trim().toLowerCase() === "true");
+
+    const isCorrect = !!(selected && isTrue((selected as any).correct));
+
+    // Record the answer
+    player.answered![r.id] = choiceId;
+    if (isCorrect) player.score += r.points;
 
     await this.persist();
-    return this.json({ ok: true, correct: !!correct, score: player.score });
+    return this.json({ ok: true, correct: isCorrect, score: player.score });
   }
 
   private async next() {
