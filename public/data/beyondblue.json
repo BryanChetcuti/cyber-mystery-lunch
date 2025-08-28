@@ -1,0 +1,65 @@
+{
+  "title": "Cyber Awareness Month — Beyond Blue Edition",
+  "rounds": [
+    {
+      "id": "r1",
+      "prompt": "You get an email that looks like Beyond Blue payroll asking you to 'update bank details' via a link. Best first move?",
+      "choices": [
+        { "id": "A", "text": "Click the link in a sandbox", "correct": false },
+        { "id": "B", "text": "Forward to IT/Security (report phishing)", "correct": true },
+        { "id": "C", "text": "Reply asking if it’s legit", "correct": false },
+        { "id": "D", "text": "Ignore it forever", "correct": false }
+      ],
+      "points": 10,
+      "seconds": 15
+    },
+    {
+      "id": "r2",
+      "prompt": "A USB stick labeled 'Staff Roster' is found in the kitchen. Safest action?",
+      "choices": [
+        { "id": "A", "text": "Plug it into a spare laptop", "correct": false },
+        { "id": "B", "text": "Hand it to IT/Security for analysis", "correct": true },
+        { "id": "C", "text": "Leave it; someone will need it", "correct": false },
+        { "id": "D", "text": "Throw it in recycling", "correct": false }
+      ],
+      "points": 10,
+      "seconds": 15
+    },
+    {
+      "id": "r3",
+      "prompt": "A colleague admits they reuse the same password for Beyond Blue and personal streaming. Best advice?",
+      "choices": [
+        { "id": "A", "text": "Reusing is fine if it's long", "correct": false },
+        { "id": "B", "text": "Use unique passphrases + a password manager", "correct": true },
+        { "id": "C", "text": "Write them down but hide well", "correct": false },
+        { "id": "D", "text": "Rotate the same password every 6 months", "correct": false }
+      ],
+      "points": 10,
+      "seconds": 15
+    },
+    {
+      "id": "r4",
+      "prompt": "Your phone is flooded with MFA prompts you didn’t initiate. What now?",
+      "choices": [
+        { "id": "A", "text": "Approve one to stop the spam", "correct": false },
+        { "id": "B", "text": "Deny all and report immediately", "correct": true },
+        { "id": "C", "text": "Disable MFA for the day", "correct": false },
+        { "id": "D", "text": "Restart the phone and ignore", "correct": false }
+      ],
+      "points": 10,
+      "seconds": 15
+    },
+    {
+      "id": "r5",
+      "prompt": "SUPER HARD: You inspect a 'Beyond Blue Support' email’s headers. Results: Received-SPF: softfail; Authentication-Results: dkim=pass header.d=mailer.example; dmarc=fail (p=reject) header.from=beyondblue.org.au. Best conclusion?",
+      "choices": [
+        { "id": "A", "text": "Safe — DKIM passed, so it’s authentic", "correct": false },
+        { "id": "B", "text": "Likely spoofed — DMARC fail with misaligned DKIM (d=mailer.example) vs From domain; treat as phishing", "correct": true },
+        { "id": "C", "text": "Safe — From shows beyondblue.org.au", "correct": false },
+        { "id": "D", "text": "Inconclusive — click the link to verify", "correct": false }
+      ],
+      "points": 20,
+      "seconds": 15
+    }
+  ]
+}
