@@ -72,18 +72,22 @@ https://cyber-mystery-lunch.your-team.workers.dev
 
 ```
 cyber-mystery-lunch/
-├── data/                 # Game scenarios
-│   ├── serious.json
-│   └── funny.json
-├── public/               # Static frontend
+├── public/               # Static frontend & assets
 │   ├── index.html        # Join / Host setup
 │   ├── host.html         # Host controls + scoreboard
 │   ├── game.html         # Player UI
 │   ├── app.css
+│   ├── data/             # Game scenarios (served to clients)
+│   │   ├── serious.json
+│   │   ├── funny.json
+│   │   └── easter-egg.json
+│   └── docs/             # Extra docs served statically
+│       ├── api.md
+│       └── host-cheat-sheet.md
 ├── worker/               # Cloudflare Worker + Durable Object
 │   ├── index.ts
 │   └── types.ts
-├── wrangler.toml
+├── wrangler.toml         # Wrangler config (assets=public, DO migration, etc.)
 ├── package.json
 └── README.md
 ```
