@@ -6,11 +6,13 @@ Use it alongside the app — no coding knowledge needed.
 ---
 
 ## Quick Setup
-1. Open the game URL (Cloudflare Workers link).  
-2. Under **Start a Game (Host)**, choose *Serious* or *Funny*.  
-3. Tap the big title **7×** to unlock **Easter Egg mode (🪄)**.  
-4. Click **Create & Open Host View**.  
-5. Share the game code (default: `demo`) with players.  
+1.Open the game URL.
+2.Pick Serious or Funny. (Tap title 7× for Easter.)
+3.Enter Game Code (e.g., lunch-a).
+4.Create & Open Host View → share code on the big screen.
+5.Start Game → timer appears.
+6.Use Next Round / Auto-next as desired.
+7.Game ends → winners shown. 
 
 ---
 
