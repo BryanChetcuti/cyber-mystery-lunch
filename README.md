@@ -57,41 +57,41 @@ cyber-mystery-lunch/
 
 ---
 
-## 🧑‍💻 Local Dev
+## 🧑‍💻 Local Development
 
 ```bash
 # install deps
 npm i
 
+```bash
 # run locally with hot reload
 npm run dev
 
+```bash
 # deploy to Cloudflare Workers
 npm run deploy
-🌐 Deployment
 
-Install Wrangler
-:
-
-npm install -g wrangler
-
-
-Authenticate:
+---
+## 🌐 Deployment
+1. **Install Wrangler**
+   ```bash
+   npm install -g wrangler
+Authenticate
 
 wrangler login
+Deploy
 
-
-Deploy:
 
 npm run deploy
+(Optional) Add a custom domain in Cloudflare Dashboard →
+Workers & Pages → Triggers → Custom Domains
 
+---
+## ✍️ Writing Scenarios
 
-(Optional) Add a custom domain in Cloudflare Dashboard → Workers & Pages → Triggers → Custom Domains.
+Each round lives in `public/data/*.json`. Example:
 
-✍️ Writing Scenarios
-
-Each round lives in public/data/*.json. Example:
-
+```json
 {
   "id": "r1",
   "prompt": "Unusual outbound traffic detected. What do you do?",
@@ -105,26 +105,30 @@ Each round lives in public/data/*.json. Example:
   "seconds": 30
 }
 
-🧑‍🤝‍🧑 Contributing
+---
+## 🧑‍🤝‍🧑 Contributing
 
 Pull Requests welcome!
 
-Add new scenarios under public/data/
+- Add new scenarios under `public/data/`  
+- Improve UI/UX for host or players  
+- File issues for bugs, ideas, or new features
 
-Improve UI/UX for host or players
-
-File issues for bugs, ideas, or new features
-
-📜 License
+---
+## 📜 License
 
 MIT — free to use, hack, and share.
+---
+## 🎯 Roadmap
 
-🎯 Roadmap
+- [ ] QR code join link  
+- [ ] Sound cue when timer hits 0  
+- [ ] Persist results to KV/D1  
+- [ ] Optional host PIN for extra control
 
- QR code join link
+## 🙏 Acknowledgements
 
- Sound cue when timer hits 0
+This project was inspired by a colleague whose creativity gave me the push to try my own spin.  
+Her approach showed how learning can be fun, fast, and memorable — this game is a small homage to that spark.
 
- Persist results to KV/D1
 
- Optional host PIN for extra control
