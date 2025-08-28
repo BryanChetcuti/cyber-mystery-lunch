@@ -23,7 +23,7 @@ Playable on phones, hosted on **Cloudflare Workers**, and fully open for customi
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/your-org/cyber-mystery-lunch.git
+git clone https://github.com/bchetcuti/cyber-mystery-lunch.git
 cd cyber-mystery-lunch
 npm install
 ```
