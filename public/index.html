@@ -9,26 +9,49 @@
   <body>
     <div class="container">
       <h1>Cyber Mystery Lunch</h1>
+
+      <!-- HOST -->
       <div class="card">
         <h3>Start a Game (Host)</h3>
+
         <label class="small">Mode</label>
         <select id="mode">
           <option value="serious">Serious</option>
           <option value="funny">Funny</option>
         </select>
+
+        <label class="small" style="margin-top:8px;">Game Code</label>
+        <input id="hostCode" placeholder="e.g. demo, lunch1, teamA" />
+
         <button class="btn" id="hostBtn">Create & Open Host View</button>
+        <div class="small" id="hostHint">Tip: tap the big title 7× to unlock a hidden mode.</div>
       </div>
+
+      <!-- PLAYER -->
       <div class="card">
         <h3>Join a Game (Player)</h3>
+
         <label class="small">Game Code</label>
         <input id="code" placeholder="e.g. demo" />
+
         <label class="small">Your Name</label>
         <input id="name" placeholder="e.g. Alex" />
+
         <button class="btn" id="joinBtn">Join</button>
       </div>
     </div>
+
     <script>
-      // Easter egg: tap title 7× → hidden mode
+      // ---------- tiny toast ----------
+      function toast(msg) {
+        const el = document.createElement('div');
+        el.textContent = msg;
+        el.style.cssText = 'position:fixed;left:50%;top:20px;transform:translateX(-50%);background:#111a;backdrop-filter: blur(6px);padding:10px 14px;border-radius:10px;border:1px solid #2a3344;color:#e6edf3;z-index:9999';
+        document.body.appendChild(el);
+        setTimeout(()=>el.remove(), 2500);
+      }
+
+      // ---------- Easter Egg unlock (7 taps on title) ----------
       let taps = 0, egg = false, tapTimer = null;
       const titleEl = document.querySelector('h1');
       titleEl.style.userSelect = 'none';
@@ -44,60 +67,66 @@
           toast('🪄 Easter Egg unlocked!');
         }
       });
-    
+
+      // ---------- scenario loading ----------
       async function loadScenario(mode) {
         const path = egg ? '/data/easter-egg.json'
                          : (mode === 'funny' ? '/data/funny.json' : '/data/serious.json');
-        const res = await fetch(path);
+        const res = await fetch(path, { cache: 'no-store' });
         if (!res.ok) throw new Error(`Failed to load scenario: ${path} (${res.status})`);
         return res.json();
       }
-    
-      function toast(msg) {
-        const el = document.createElement('div');
-        el.textContent = msg;
-        el.style.cssText = 'position:fixed;left:50%;top:20px;transform:translateX(-50%);background:#111a;backdrop-filter: blur(6px);padding:10px 14px;border-radius:10px;border:1px solid #2a3344;color:#e6edf3;z-index:9999';
-        document.body.appendChild(el);
-        setTimeout(()=>el.remove(), 2200);
-      }
-    
+
+      // ---------- HOST: create room + open host console ----------
       document.getElementById('hostBtn').onclick = async () => {
         const modeSel = document.getElementById('mode').value;
         const mode = egg ? 'easter' : modeSel;
-        const code = 'demo';
-    
+        const code = (document.getElementById('hostCode').value || 'demo').trim();
+
         try {
+          // Load scenario JSON from /public/data
           const scenario = await loadScenario(mode);
-          const resp = await fetch(`/api/create?code=${code}`, {
+
+          // Create room via API (posts full scenario)
+          const resp = await fetch(`/api/create?code=${encodeURIComponent(code)}`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ mode, scenario })
           });
-          if (!resp.ok) {
-            const t = await resp.text();
-            throw new Error(`Create failed: ${resp.status} ${t}`);
-          }
-          location.href = `/host.html?code=${code}`;
+          if (!resp.ok) throw new Error(`Create failed: ${resp.status}`);
+
+          // Go to host console
+          location.href = `/host.html?code=${encodeURIComponent(code)}`;
         } catch (e) {
           console.error(e);
           toast(`❌ ${e.message}`);
         }
       };
-    
+
+      // ---------- PLAYER: join ----------
       document.getElementById('joinBtn').onclick = async () => {
-        const code = document.getElementById('code').value || 'demo';
-        const name = document.getElementById('name').value || 'Player';
+        const code = (document.getElementById('code').value || 'demo').trim();
+        const name = (document.getElementById('name').value || 'Player').trim();
+
         try {
-          const r = await fetch(`/api/join?code=${code}`, {
+          const r = await fetch(`/api/join?code=${encodeURIComponent(code)}`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ name })
           });
-          if (!r.ok) throw new Error(`Join failed: ${r.status}`);
+          if (!r.ok) {
+            const t = await r.text();
+            throw new Error(`Join failed: ${r.status} ${t}`);
+          }
           const data = await r.json();
+          if (!data.playerId) throw new Error('Join failed: missing playerId');
+
+          // Store for /game.html
           localStorage.setItem('playerId', data.playerId);
           localStorage.setItem('code', code);
-          location.href = `/game.html?code=${code}`;
+
+          // Go to player screen
+          location.href = `/game.html?code=${encodeURIComponent(code)}`;
         } catch (e) {
           console.error(e);
           toast(`❌ ${e.message}`);
