@@ -1,0 +1,15 @@
+:root { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #0b0f14; color: #e6edf3; }
+.container { max-width: 720px; margin: 0 auto; padding: 20px; }
+.card { background: #121821; border: 1px solid #1e2633; border-radius: 12px; padding: 16px; margin: 12px 0; }
+.btn { display: block; width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #2a3344; background: #1a2230; color: #e6edf3; font-weight: 600; margin: 8px 0; }
+.btn:active { transform: scale(0.99); }
+.choice { padding: 12px; border: 1px solid #2a3344; border-radius: 10px; margin: 8px 0; cursor: pointer; }
+.choice:hover { background: #151c27; }
+.row { display: flex; gap: 8px; }
+.row .btn { flex: 1; }
+input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #2a3344; background: #0f141c; color: #e6edf3; }
+h1, h2, h3 { margin: 8px 0 12px; }
+.small { opacity: 0.8; font-size: 0.9rem; }
+.center { text-align: center; }

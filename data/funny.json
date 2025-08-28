@@ -1,0 +1,66 @@
+{
+    "title": "Fridge Ransomware Fiesta",
+    "rounds": [
+      {
+        "id": "r1",
+        "prompt": "The fridge logs are wild. Which line is sus?",
+        "choices": [
+          { "id": "A", "text": "fridge-01 OPEN_DOOR", "correct": false },
+          { "id": "B", "text": "fridge-01 DOWNLOAD_SALAD.jpg", "correct": true },
+          { "id": "C", "text": "fridge-01 COOLING_ON", "correct": false },
+          { "id": "D", "text": "fridge-01 LIGHT_ON", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      },
+      {
+        "id": "r2",
+        "prompt": "Email from fridge@darkweb.biz: \"Send 12 boxes of donuts or else.\" Best move?",
+        "choices": [
+          { "id": "A", "text": "Send the donuts", "correct": false },
+          { "id": "B", "text": "Block the fridge’s email + report", "correct": true },
+          { "id": "C", "text": "Write a heartfelt poem", "correct": false },
+          { "id": "D", "text": "Pretend you don’t like coffee", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      },
+      {
+        "id": "r3",
+        "prompt": "Fridge is streaming cat videos to a mysterious IP. Containment?",
+        "choices": [
+          { "id": "A", "text": "Unplug the router (quick kill-switch)", "correct": true },
+          { "id": "B", "text": "Ask for the fridge’s Netflix password", "correct": false },
+          { "id": "C", "text": "Add more ice packs", "correct": false },
+          { "id": "D", "text": "Post on TikTok about it", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      },
+      {
+        "id": "r4",
+        "prompt": "New account detected: snack_admin@office.com. Best action?",
+        "choices": [
+          { "id": "A", "text": "Give them an office badge", "correct": false },
+          { "id": "B", "text": "Reset all fridge PINs + audit access", "correct": true },
+          { "id": "C", "text": "Garlic around the fridge as protection", "correct": false },
+          { "id": "D", "text": "Offer them a raise", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      },
+      {
+        "id": "r5",
+        "prompt": "Rick Astley blares from the crisper drawer. Final move?",
+        "choices": [
+          { "id": "A", "text": "Dance", "correct": false },
+          { "id": "B", "text": "Firmware forensics + restore config", "correct": true },
+          { "id": "C", "text": "Smash it with a cricket bat", "correct": false },
+          { "id": "D", "text": "Blame the interns", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      }
+    ]
+  }
+  

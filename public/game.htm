@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Play · Cyber Mystery Lunch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="/app.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <h2 id="title">Game</h2>
+    <div class="card">
+      <div id="prompt" class="center">Waiting for host…</div>
+      <div id="choices"></div>
+    </div>
+    <div class="card">
+      <div id="status" class="small">—</div>
+    </div>
+  </div>
+  <script>
+    const code = new URL(location.href).searchParams.get('code') || localStorage.getItem('code') || 'demo';
+    const playerId = localStorage.getItem('playerId');
+
+    async function refresh() {
+      const cur = await (await fetch(`/api/current?code=${code}`)).json();
+      if (!cur.round) { document.getElementById('prompt').textContent = cur.phase === 'results' ? 'Results soon…' : 'Waiting for host…'; return; }
+      document.getElementById('prompt').textContent = cur.round.prompt;
+      document.getElementById('choices').innerHTML = cur.round.choices.map(c =>
+        `<div class="choice" data-id="${c.id}">${c.id}. ${c.text}</div>`
+      ).join('');
+      document.querySelectorAll('.choice').forEach(el => {
+        el.onclick = async () => {
+          const choiceId = el.getAttribute('data-id');
+          const r = await (await fetch(`/api/answer?code=${code}`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ playerId, choiceId })
+          })).json();
+          document.getElementById('status').textContent = r.already ? 'Already answered' : (r.correct ? '✅ Correct!' : '❌ Not quite');
+        };
+      });
+    }
+    setInterval(refresh, 1200);
+    refresh();
+  </script>
+</body>
+</html>

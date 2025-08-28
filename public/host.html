@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Host · Cyber Mystery Lunch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="/app.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <h2>Host Console</h2>
+    <div class="card">
+      <div id="room"></div>
+      <div class="row">
+        <button class="btn" id="startBtn">Start Game</button>
+        <button class="btn" id="nextBtn">Next Round</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Scoreboard</h3>
+      <div id="score"></div>
+    </div>
+  </div>
+  <script>
+    const code = new URL(location.href).searchParams.get('code') || 'demo';
+    async function refresh() {
+      const s = await (await fetch(`/api/scoreboard?code=${code}`)).json();
+      const list = (s.players||[]).map(p => `<div class="choice">${p.name} — <b>${p.score}</b></div>`).join('');
+      document.getElementById('score').innerHTML = list || 'No players yet.';
+      const cur = await (await fetch(`/api/current?code=${code}`)).json();
+      document.getElementById('room').innerHTML = `
+        <div>Phase: <b>${cur.phase}</b></div>
+        <div>Round: <b>${(cur.idx ?? -1) + 1}</b></div>
+      `;
+    }
+    setInterval(refresh, 1500);
+    document.getElementById('startBtn').onclick = async () => {
+      await fetch(`/api/start?code=${code}`, { method: 'POST' });
+      refresh();
+    };
+    document.getElementById('nextBtn').onclick = async () => {
+      await fetch(`/api/next?code=${code}`, { method: 'POST' });
+      refresh();
+    };
+    refresh();
+  </script>
+</body>
+</html>

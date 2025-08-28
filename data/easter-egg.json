@@ -1,0 +1,66 @@
+{
+    "title": "Secret Ops: The Hidden Build",
+    "rounds": [
+      {
+        "id": "r1",
+        "prompt": "A canary domain pings 127.0.53.53. What does this usually indicate?",
+        "choices": [
+          { "id": "A", "text": "Localhost is down", "correct": false },
+          { "id": "B", "text": "Name collision / DNS issue indicator", "correct": true },
+          { "id": "C", "text": "It’s coffee time", "correct": false },
+          { "id": "D", "text": "ARP storm", "correct": false }
+        ],
+        "points": 12,
+        "seconds": 40
+      },
+      {
+        "id": "r2",
+        "prompt": "Someone enabled a prod feature flag without a change ticket. Best immediate response?",
+        "choices": [
+          { "id": "A", "text": "Roll back flag + capture context", "correct": true },
+          { "id": "B", "text": "Rename the flag to ‘totally-safe’", "correct": false },
+          { "id": "C", "text": "Ignore if users are happy", "correct": false },
+          { "id": "D", "text": "Tweet the flag name for transparency", "correct": false }
+        ],
+        "points": 12,
+        "seconds": 40
+      },
+      {
+        "id": "r3",
+        "prompt": "Blue/Green deploy went sideways. Traffic split is 10/90 instead of 50/50. Best fix?",
+        "choices": [
+          { "id": "A", "text": "Rebalance traffic; verify health checks; pause new deploys", "correct": true },
+          { "id": "B", "text": "Purge all caches randomly", "correct": false },
+          { "id": "C", "text": "Scale everything to 11", "correct": false },
+          { "id": "D", "text": "Pray to the demo gods", "correct": false }
+        ],
+        "points": 12,
+        "seconds": 40
+      },
+      {
+        "id": "r4",
+        "prompt": "Build pipeline fails only on Fridays. Most likely culprit?",
+        "choices": [
+          { "id": "A", "text": "Cron-based secret rotation misaligned with builds", "correct": true },
+          { "id": "B", "text": "Mercury in retrograde", "correct": false },
+          { "id": "C", "text": "Tabs vs spaces", "correct": false },
+          { "id": "D", "text": "The office plant", "correct": false }
+        ],
+        "points": 12,
+        "seconds": 40
+      },
+      {
+        "id": "r5",
+        "prompt": "Konami code discovered in the admin UI. What should it unlock? (Be honest.)",
+        "choices": [
+          { "id": "A", "text": "Dark mode + confetti", "correct": true },
+          { "id": "B", "text": "Root on every box", "correct": false },
+          { "id": "C", "text": "Prod data export to CSV", "correct": false },
+          { "id": "D", "text": "Unlimited pizza vouchers", "correct": false }
+        ],
+        "points": 12,
+        "seconds": 40
+      }
+    ]
+  }
+  

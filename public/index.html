@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cyber Mystery Lunch</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="/app.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Cyber Mystery Lunch</h1>
+      <div class="card">
+        <h3>Start a Game (Host)</h3>
+        <label class="small">Mode</label>
+        <select id="mode">
+          <option value="serious">Serious</option>
+          <option value="funny">Funny</option>
+        </select>
+        <button class="btn" id="hostBtn">Create & Open Host View</button>
+      </div>
+      <div class="card">
+        <h3>Join a Game (Player)</h3>
+        <label class="small">Game Code</label>
+        <input id="code" placeholder="e.g. demo" />
+        <label class="small">Your Name</label>
+        <input id="name" placeholder="e.g. Alex" />
+        <button class="btn" id="joinBtn">Join</button>
+      </div>
+    </div>
+    <script>
+        // Easter egg: tap title 7x → unlocks hidden mode
+        let taps = 0, egg = false, tapTimer = null;
+        const titleEl = document.querySelector('h1');
+        titleEl.style.userSelect = 'none';
+        titleEl.style.cursor = 'pointer';
+        titleEl.title = '👀';
+        titleEl.addEventListener('click', () => {
+          taps++;
+          clearTimeout(tapTimer);
+          tapTimer = setTimeout(() => { taps = 0; }, 800);
+          if (taps >= 7) {
+            egg = true;
+            taps = 0;
+            alert('🪄 Easter Egg unlocked!');
+          }
+        });
+      
+        async function loadScenario(mode) {
+          const path = egg ? '/data/easter-egg.json' :
+                      (mode === 'funny' ? '/data/funny.json' : '/data/serious.json');
+          const res = await fetch(path);
+          if (!res.ok) throw new Error('Failed to load scenario: ' + path);
+          return res.json();
+        }
+      
+        document.getElementById('hostBtn').onclick = async () => {
+          const mode = egg ? 'easter' : document.getElementById('mode').value;
+          const code = 'demo'; // simple single-room code; adjust if you want multiple rooms
+          const scenario = await loadScenario(mode);
+          await fetch(`/api/create?code=${code}`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ mode, scenario })
+          });
+          location.href = `/host.html?code=${code}`;
+        };
+      
+        document.getElementById('joinBtn').onclick = async () => {
+          const code = document.getElementById('code').value || 'demo';
+          const name = document.getElementById('name').value || 'Player';
+          const r = await fetch(`/api/join?code=${code}`, {
+            method: 'POST',
+            body: JSON.stringify({ name })
+          }).then(r => r.json());
+          localStorage.setItem('playerId', r.playerId);
+          localStorage.setItem('code', code);
+          location.href = `/game.html?code=${code}`;
+        };
+      </script>
+      
+  </body>
+</html>

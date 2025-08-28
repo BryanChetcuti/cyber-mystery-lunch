@@ -1,0 +1,66 @@
+{
+    "title": "The Lunch Break Breach",
+    "rounds": [
+      {
+        "id": "r1",
+        "prompt": "You spot multiple requests around 12:05. Which log line is most suspicious?",
+        "choices": [
+          { "id": "A", "text": "10.0.4.12 — GET /intranet", "correct": false },
+          { "id": "B", "text": "192.168.1.77 — POST /admin", "correct": true },
+          { "id": "C", "text": "127.0.0.1 — healthcheck", "correct": false },
+          { "id": "D", "text": "10.0.5.20 — GET /docs/index.html", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      },
+      {
+        "id": "r2",
+        "prompt": "CFO receives: \"URGENT: Update bank details or payroll will be delayed. Click here.\" What’s the best first step?",
+        "choices": [
+          { "id": "A", "text": "Click the link to check", "correct": false },
+          { "id": "B", "text": "Forward to SOC for analysis", "correct": true },
+          { "id": "C", "text": "Reply asking for clarification", "correct": false },
+          { "id": "D", "text": "Delete and move on", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      },
+      {
+        "id": "r3",
+        "prompt": "Unusual outbound traffic to a foreign IP. Immediate containment?",
+        "choices": [
+          { "id": "A", "text": "Shut down internet egress temporarily", "correct": true },
+          { "id": "B", "text": "Wait for more logs", "correct": false },
+          { "id": "C", "text": "Reboot random servers", "correct": false },
+          { "id": "D", "text": "Send an all-company apology email", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      },
+      {
+        "id": "r4",
+        "prompt": "Evidence shows attempts to create new admin accounts. Best next step?",
+        "choices": [
+          { "id": "A", "text": "Reset passwords/rotate creds org-wide", "correct": true },
+          { "id": "B", "text": "Ignore since they failed", "correct": false },
+          { "id": "C", "text": "Delete the suspicious account only", "correct": false },
+          { "id": "D", "text": "Run a phishing simulation immediately", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      },
+      {
+        "id": "r5",
+        "prompt": "Breach contained. Leadership asks: what next?",
+        "choices": [
+          { "id": "A", "text": "Delete logs to save space", "correct": false },
+          { "id": "B", "text": "Full forensics + lessons learned", "correct": true },
+          { "id": "C", "text": "Celebrate with cake immediately", "correct": false },
+          { "id": "D", "text": "Assume it’s fine and move on", "correct": false }
+        ],
+        "points": 10,
+        "seconds": 45
+      }
+    ]
+  }
+  
