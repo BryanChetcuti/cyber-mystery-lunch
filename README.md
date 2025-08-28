@@ -204,10 +204,10 @@ Short lines you can read aloud during the game.
 
 ## 🧩 Roadmap / Nice-to-haves
 
-* Countdown timers for all players.
-* QR code join link.
-* Persistent leaderboards (Cloudflare KV/D1).
-* Azure Functions deployment variant.
+* QR code join link on Host Console.
+* Sound cue at timer 0.
+* Persist results (KV/D1).
+* Optional auth/PIN for host actions.
 
 ---
 
