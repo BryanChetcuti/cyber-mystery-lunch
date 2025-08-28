@@ -28,55 +28,81 @@
       </div>
     </div>
     <script>
-        // Easter egg: tap title 7x → unlocks hidden mode
-        let taps = 0, egg = false, tapTimer = null;
-        const titleEl = document.querySelector('h1');
-        titleEl.style.userSelect = 'none';
-        titleEl.style.cursor = 'pointer';
-        titleEl.title = '👀';
-        titleEl.addEventListener('click', () => {
-          taps++;
-          clearTimeout(tapTimer);
-          tapTimer = setTimeout(() => { taps = 0; }, 800);
-          if (taps >= 7) {
-            egg = true;
-            taps = 0;
-            alert('🪄 Easter Egg unlocked!');
-          }
-        });
-      
-        async function loadScenario(mode) {
-          const path = egg ? '/data/easter-egg.json' :
-                      (mode === 'funny' ? '/data/funny.json' : '/data/serious.json');
-          const res = await fetch(path);
-          if (!res.ok) throw new Error('Failed to load scenario: ' + path);
-          return res.json();
+      // Easter egg: tap title 7× → hidden mode
+      let taps = 0, egg = false, tapTimer = null;
+      const titleEl = document.querySelector('h1');
+      titleEl.style.userSelect = 'none';
+      titleEl.style.cursor = 'pointer';
+      titleEl.title = '👀';
+      titleEl.addEventListener('click', () => {
+        taps++;
+        clearTimeout(tapTimer);
+        tapTimer = setTimeout(() => { taps = 0; }, 800);
+        if (taps >= 7) {
+          egg = true;
+          taps = 0;
+          toast('🪄 Easter Egg unlocked!');
         }
-      
-        document.getElementById('hostBtn').onclick = async () => {
-          const mode = egg ? 'easter' : document.getElementById('mode').value;
-          const code = 'demo'; // simple single-room code; adjust if you want multiple rooms
+      });
+    
+      async function loadScenario(mode) {
+        const path = egg ? '/data/easter-egg.json'
+                         : (mode === 'funny' ? '/data/funny.json' : '/data/serious.json');
+        const res = await fetch(path);
+        if (!res.ok) throw new Error(`Failed to load scenario: ${path} (${res.status})`);
+        return res.json();
+      }
+    
+      function toast(msg) {
+        const el = document.createElement('div');
+        el.textContent = msg;
+        el.style.cssText = 'position:fixed;left:50%;top:20px;transform:translateX(-50%);background:#111a;backdrop-filter: blur(6px);padding:10px 14px;border-radius:10px;border:1px solid #2a3344;color:#e6edf3;z-index:9999';
+        document.body.appendChild(el);
+        setTimeout(()=>el.remove(), 2200);
+      }
+    
+      document.getElementById('hostBtn').onclick = async () => {
+        const modeSel = document.getElementById('mode').value;
+        const mode = egg ? 'easter' : modeSel;
+        const code = 'demo';
+    
+        try {
           const scenario = await loadScenario(mode);
-          await fetch(`/api/create?code=${code}`, {
+          const resp = await fetch(`/api/create?code=${code}`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ mode, scenario })
           });
+          if (!resp.ok) {
+            const t = await resp.text();
+            throw new Error(`Create failed: ${resp.status} ${t}`);
+          }
           location.href = `/host.html?code=${code}`;
-        };
-      
-        document.getElementById('joinBtn').onclick = async () => {
-          const code = document.getElementById('code').value || 'demo';
-          const name = document.getElementById('name').value || 'Player';
+        } catch (e) {
+          console.error(e);
+          toast(`❌ ${e.message}`);
+        }
+      };
+    
+      document.getElementById('joinBtn').onclick = async () => {
+        const code = document.getElementById('code').value || 'demo';
+        const name = document.getElementById('name').value || 'Player';
+        try {
           const r = await fetch(`/api/join?code=${code}`, {
             method: 'POST',
+            headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ name })
-          }).then(r => r.json());
-          localStorage.setItem('playerId', r.playerId);
+          });
+          if (!r.ok) throw new Error(`Join failed: ${r.status}`);
+          const data = await r.json();
+          localStorage.setItem('playerId', data.playerId);
           localStorage.setItem('code', code);
           location.href = `/game.html?code=${code}`;
-        };
-      </script>
-      
+        } catch (e) {
+          console.error(e);
+          toast(`❌ ${e.message}`);
+        }
+      };
+    </script>
   </body>
 </html>
