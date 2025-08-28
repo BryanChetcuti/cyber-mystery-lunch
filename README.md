@@ -1,7 +1,3 @@
-Here’s the **final polished `README.md`** with everything merged — Quick Start, Host Guide, and Host Script all in one flow so anyone on your team can pick it up and run the game without thinking.
-
----
-
 # 🍕🔐 Cyber Mystery Lunch
 
 A quick, team-friendly web game for solving a lighthearted **tech mystery** over lunch.
