@@ -3,14 +3,14 @@ main = "worker/index.ts"
 compatibility_date = "2025-08-01"
 
 [assets]
-directory = "./public"            # v4 syntax
+directory = "./public"   # IMPORTANT: serve only the /public folder as static assets
 
 [durable_objects]
 bindings = [
   { name = "GAME_ROOM", class_name = "GameRoom" }
 ]
 
-# IMPORTANT: use new_sqlite_classes on Free plan
+# Required on Free plan:
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["GameRoom"]
