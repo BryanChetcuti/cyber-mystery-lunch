@@ -11,7 +11,7 @@
           { "id": "D", "text": "ARP storm", "correct": false }
         ],
         "points": 12,
-        "seconds": 40
+        "seconds": 10
       },
       {
         "id": "r2",
@@ -23,7 +23,7 @@
           { "id": "D", "text": "Tweet the flag name for transparency", "correct": false }
         ],
         "points": 12,
-        "seconds": 40
+        "seconds": 10
       },
       {
         "id": "r3",
@@ -35,7 +35,7 @@
           { "id": "D", "text": "Pray to the demo gods", "correct": false }
         ],
         "points": 12,
-        "seconds": 40
+        "seconds": 10
       },
       {
         "id": "r4",
@@ -47,7 +47,7 @@
           { "id": "D", "text": "The office plant", "correct": false }
         ],
         "points": 12,
-        "seconds": 40
+        "seconds": 10
       },
       {
         "id": "r5",
@@ -59,7 +59,7 @@
           { "id": "D", "text": "Unlimited pizza vouchers", "correct": false }
         ],
         "points": 12,
-        "seconds": 40
+        "seconds": 10
       }
     ]
   }

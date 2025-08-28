@@ -11,7 +11,7 @@
           { "id": "D", "text": "10.0.5.20 — GET /docs/index.html", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       },
       {
         "id": "r2",
@@ -23,7 +23,7 @@
           { "id": "D", "text": "Delete and move on", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       },
       {
         "id": "r3",
@@ -35,7 +35,7 @@
           { "id": "D", "text": "Send an all-company apology email", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       },
       {
         "id": "r4",
@@ -47,7 +47,7 @@
           { "id": "D", "text": "Run a phishing simulation immediately", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       },
       {
         "id": "r5",
@@ -59,7 +59,7 @@
           { "id": "D", "text": "Assume it’s fine and move on", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       }
     ]
   }

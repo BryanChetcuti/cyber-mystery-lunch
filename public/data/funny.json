@@ -11,7 +11,7 @@
           { "id": "D", "text": "fridge-01 LIGHT_ON", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       },
       {
         "id": "r2",
@@ -23,7 +23,7 @@
           { "id": "D", "text": "Pretend you don’t like coffee", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       },
       {
         "id": "r3",
@@ -35,7 +35,7 @@
           { "id": "D", "text": "Post on TikTok about it", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       },
       {
         "id": "r4",
@@ -47,7 +47,7 @@
           { "id": "D", "text": "Offer them a raise", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       },
       {
         "id": "r5",
@@ -59,7 +59,7 @@
           { "id": "D", "text": "Blame the interns", "correct": false }
         ],
         "points": 10,
-        "seconds": 45
+        "seconds": 10
       }
     ]
   }
