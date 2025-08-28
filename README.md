@@ -1,7 +1,3 @@
-Here’s the **final polished `README.md`** with everything merged — Quick Start, Host Guide, and Host Script all in one flow so anyone on your team can pick it up and run the game without thinking.
-
----
-
 # 🍕🔐 Cyber Mystery Lunch
 
 A quick, team-friendly web game for solving a lighthearted **tech mystery** over lunch.
@@ -27,7 +23,7 @@ Playable on phones, hosted on **Cloudflare Workers**, and fully open for customi
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/your-org/cyber-mystery-lunch.git
+git clone https://github.com/bchetcuti/cyber-mystery-lunch.git
 cd cyber-mystery-lunch
 npm install
 ```
