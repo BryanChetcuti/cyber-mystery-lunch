@@ -35,6 +35,7 @@
         <select id="mode">
           <option value="serious">Serious</option>
           <option value="funny">Funny</option>
+          <option value="awareness">Cyber Awareness (Beyond Blue)</option>
         </select>
 
         <label class="small" style="margin-top:8px;">Game Code</label>
@@ -87,7 +88,9 @@
       // ---------- scenario loading ----------
       async function loadScenario(mode) {
         const path = egg ? '/data/easter-egg.json'
-                         : (mode === 'funny' ? '/data/funny.json' : '/data/serious.json');
+                         : mode === 'funny' ? '/data/funny.json'
+      : mode === 'awareness' ? '/data/beyondblue.json'
+      : '/data/serious.json';
         const res = await fetch(path, { cache: 'no-store' });
         if (!res.ok) throw new Error(`Failed to load scenario: ${path} (${res.status})`);
         return res.json();
