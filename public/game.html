@@ -20,14 +20,60 @@
   <script>
     const code = new URL(location.href).searchParams.get('code') || localStorage.getItem('code') || 'demo';
     const playerId = localStorage.getItem('playerId');
-
+  
+    let lastRoundId = null;
+  
+    function setStatus(msg) {
+      document.getElementById('status').textContent = msg || '—';
+    }
+  
+    function showEnd(results) {
+      const container = document.querySelector('.container');
+      const players = (results.players || []).sort((a, b) => b.score - a.score);
+      const top = players[0];
+      document.getElementById('prompt').textContent = 'Game Over';
+      document.getElementById('choices').innerHTML = players
+        .map((p, i) => `<div class="choice">${i === 0 ? '🏆 ' : ''}${p.name} — <b>${p.score}</b></div>`)
+        .join('');
+      setStatus(top ? `Winner: ${top.name} (${top.score})` : 'No players');
+      // action buttons
+      const actions = document.createElement('div');
+      actions.className = 'row';
+      actions.innerHTML = `
+        <button class="btn" id="homeBtn">Back to Home</button>
+        <button class="btn" id="joinBtn">Join Another Game</button>
+      `;
+      document.querySelector('.container').appendChild(actions);
+      document.getElementById('homeBtn').onclick = () => (location.href = '/');
+      document.getElementById('joinBtn').onclick = () => (location.href = '/index.html');
+    }
+  
     async function refresh() {
       const cur = await (await fetch(`/api/current?code=${code}`)).json();
-      if (!cur.round) { document.getElementById('prompt').textContent = cur.phase === 'results' ? 'Results soon…' : 'Waiting for host…'; return; }
+  
+      if (cur.phase === 'results') {
+        const s = await (await fetch(`/api/scoreboard?code=${code}`)).json();
+        showEnd(s);
+        return;
+      }
+  
+      if (!cur.round) {
+        document.getElementById('prompt').textContent = cur.phase === 'lobby' ? 'Waiting for host…' : 'Loading…';
+        document.getElementById('choices').innerHTML = '';
+        return;
+      }
+  
+      // If round changed, clear any prior “Correct/Not quite”
+      if (cur.round.id !== lastRoundId) {
+        lastRoundId = cur.round.id;
+        setStatus('—');
+      }
+  
       document.getElementById('prompt').textContent = cur.round.prompt;
-      document.getElementById('choices').innerHTML = cur.round.choices.map(c =>
-        `<div class="choice" data-id="${c.id}">${c.id}. ${c.text}</div>`
-      ).join('');
+      document.getElementById('choices').innerHTML = cur.round.choices
+        .map(c => `<div class="choice" data-id="${c.id}">${c.id}. ${c.text}</div>`)
+        .join('');
+  
       document.querySelectorAll('.choice').forEach(el => {
         el.onclick = async () => {
           const choiceId = el.getAttribute('data-id');
@@ -36,12 +82,14 @@
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ playerId, choiceId })
           })).json();
-          document.getElementById('status').textContent = r.already ? 'Already answered' : (r.correct ? '✅ Correct!' : '❌ Not quite');
+          setStatus(r.already ? 'Already answered' : (r.correct ? '✅ Correct!' : '❌ Not quite'));
         };
       });
     }
+  
     setInterval(refresh, 1200);
     refresh();
   </script>
+ 
 </body>
 </html>

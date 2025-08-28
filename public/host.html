@@ -9,40 +9,143 @@
 <body>
   <div class="container">
     <h2>Host Console</h2>
+
     <div class="card">
-      <div id="room"></div>
-      <div class="row">
+      <div id="meta" class="small">—</div>
+      <div class="row" style="margin-top:8px;">
         <button class="btn" id="startBtn">Start Game</button>
         <button class="btn" id="nextBtn">Next Round</button>
+        <button class="btn" id="resetTimerBtn">Reset Timer</button>
+        <label class="btn" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+          <input type="checkbox" id="autoNext" style="width:auto;"> Auto-next on 0
+        </label>
       </div>
     </div>
+
+    <div class="card">
+      <h3>Round</h3>
+      <div id="roundPrompt" style="font-size:1.1rem;margin-bottom:8px;">Waiting…</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:2.2rem;font-weight:800;" id="timer">—</div>
+        <div class="small" id="roundInfo">—</div>
+      </div>
+    </div>
+
     <div class="card">
       <h3>Scoreboard</h3>
       <div id="score"></div>
     </div>
   </div>
+
   <script>
     const code = new URL(location.href).searchParams.get('code') || 'demo';
-    async function refresh() {
-      const s = await (await fetch(`/api/scoreboard?code=${code}`)).json();
-      const list = (s.players||[]).map(p => `<div class="choice">${p.name} — <b>${p.score}</b></div>`).join('');
-      document.getElementById('score').innerHTML = list || 'No players yet.';
-      const cur = await (await fetch(`/api/current?code=${code}`)).json();
-      document.getElementById('room').innerHTML = `
-        <div>Phase: <b>${cur.phase}</b></div>
-        <div>Round: <b>${(cur.idx ?? -1) + 1}</b></div>
+
+    let lastRoundId = null;
+    let timerSecs = null;
+    let timerHandle = null;
+
+    function setMeta(cur) {
+      const phase = cur.phase;
+      const idx = (cur.idx ?? -1) + 1;
+      document.getElementById('meta').innerHTML = `
+        <div>Code: <b style="letter-spacing:1px">${code}</b></div>
+        <div>Phase: <b>${phase}</b> &nbsp; Round: <b>${idx}</b></div>
       `;
     }
-    setInterval(refresh, 1500);
+
+    function renderScore(players) {
+      if (!players || !players.length) {
+        document.getElementById('score').innerHTML = 'No players yet.';
+        return;
+      }
+      const rows = players.map((p,i) => `
+        <div class="choice" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>${i===0 ? '🏆 ' : ''}${p.name}</span>
+          <b>${p.score}</b>
+        </div>
+      `).join('');
+      document.getElementById('score').innerHTML = rows;
+    }
+
+    function stopTimer() {
+      if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+    }
+
+    function startTimer(seconds) {
+      stopTimer();
+      timerSecs = seconds ?? null;
+      if (typeof timerSecs !== 'number' || isNaN(timerSecs)) {
+        document.getElementById('timer').textContent = '—';
+        return;
+      }
+      document.getElementById('timer').textContent = timerSecs;
+      timerHandle = setInterval(async () => {
+        timerSecs -= 1;
+        document.getElementById('timer').textContent = Math.max(0, timerSecs);
+        if (timerSecs <= 0) {
+          stopTimer();
+          if (document.getElementById('autoNext').checked) {
+            await fetch(`/api/next?code=${code}`, { method: 'POST' });
+          }
+        }
+      }, 1000);
+    }
+
+    async function refresh() {
+      // scoreboard
+      const s = await (await fetch(`/api/scoreboard?code=${code}`)).json();
+      renderScore(s.players);
+
+      // phase & round
+      const cur = await (await fetch(`/api/current?code=${code}`)).json();
+      setMeta(cur);
+
+      if (cur.phase === 'results') {
+        document.getElementById('roundPrompt').textContent = 'Game Over';
+        document.getElementById('roundInfo').textContent = 'Click Start to create a new game (or go Home).';
+        document.getElementById('timer').textContent = '—';
+        stopTimer();
+        return;
+      }
+
+      if (!cur.round) {
+        document.getElementById('roundPrompt').textContent = 'Waiting for host…';
+        document.getElementById('roundInfo').textContent = '—';
+        document.getElementById('timer').textContent = '—';
+        return;
+      }
+
+      // if round changed, reset prompt & timer
+      if (cur.round.id !== lastRoundId) {
+        lastRoundId = cur.round.id;
+        document.getElementById('roundPrompt').textContent = cur.round.prompt;
+        document.getElementById('roundInfo').textContent = `Choices: ${cur.round.choices.length} · Points: ${cur.round.points ?? 10} · Seconds: ${cur.round.seconds ?? 45}`;
+        startTimer(cur.round.seconds ?? 45);
+      }
+    }
+
     document.getElementById('startBtn').onclick = async () => {
       await fetch(`/api/start?code=${code}`, { method: 'POST' });
       refresh();
     };
+
     document.getElementById('nextBtn').onclick = async () => {
       await fetch(`/api/next?code=${code}`, { method: 'POST' });
+      // timer will reset on next refresh when round id changes
       refresh();
     };
+
+    document.getElementById('resetTimerBtn').onclick = () => {
+      startTimer(null); // clear
+      // pull current seconds again from API to restart cleanly
+      fetch(`/api/current?code=${code}`).then(r=>r.json()).then(cur=>{
+        if (cur.round) startTimer(cur.round.seconds ?? 45);
+      });
+    };
+
+    setInterval(refresh, 1200);
     refresh();
   </script>
 </body>
+
 </html>
