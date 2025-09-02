@@ -32,7 +32,28 @@ export class GameRoom implements DurableObject {
     this.env = env;
   }
 
+  // ---- Utility functions ----
+  /**
+   * Normalize a value for robust ID comparison (tolerate casing/spacing/number IDs in JSON).
+   */
+  private norm(v: unknown): string {
+    return String(v).trim().toUpperCase();
+  }
+
+  /**
+   * Interpret "correct" that may be boolean/number/string.
+   */
+  private isTrue(v: any): boolean {
+    return v === true ||
+      v === 1 ||
+      v === "1" ||
+      (typeof v === "string" && v.trim().toLowerCase() === "true");
+  }
+
   // ---- Durable Object entrypoint ----
+  /**
+   * Entrypoint for all API routes.
+   */
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname.replace(/^\/api\//, "");
@@ -45,18 +66,25 @@ export class GameRoom implements DurableObject {
     try {
       switch (path) {
         case "create":
+          // Create a new room or update scenario/mode.
           return this.createRoom(request, code);
         case "join":
+          // Add a new player to the room.
           return this.join(request);
         case "start":
+          // Start the game (move from lobby to first round).
           return this.start();
         case "current":
+          // Get current round info.
           return this.current();
         case "answer":
-          return this.answer(request); // ★ hardened below
+          // Submit an answer for the current round.
+          return this.answer(request);
         case "next":
+          // Advance to the next round or results.
           return this.next();
         case "scoreboard":
+          // Get sorted scoreboard.
           return this.scoreboard();
         default:
           return this.json({ ok: false, error: "Route not found" }, 404);
@@ -67,7 +95,10 @@ export class GameRoom implements DurableObject {
   }
 
   // ---- Room lifecycle ----
-  private async ensureRoom(code: string, mode: Mode) {
+  /**
+   * Ensure a room exists in storage, or create a new one with fallback scenario.
+   */
+  private async ensureRoom(code: string, mode: Mode): Promise<void> {
     const stored = await this.state.storage.get<RoomState>("room");
     if (stored) {
       this.data = stored;
@@ -85,11 +116,17 @@ export class GameRoom implements DurableObject {
     await this.persist();
   }
 
-  private async persist() {
+  /**
+   * Persist current room state to storage.
+   */
+  private async persist(): Promise<void> {
     await this.state.storage.put("room", this.data);
   }
 
-  private async json(body: unknown, status = 200) {
+  /**
+   * Return a JSON response.
+   */
+  private async json(body: unknown, status = 200): Promise<Response> {
     return new Response(JSON.stringify(body), {
       status,
       headers: { "content-type": "application/json; charset=utf-8" },
@@ -121,23 +158,31 @@ export class GameRoom implements DurableObject {
     };
   }
 
-  private currentRound() {
+  /**
+   * Get the current round, or null if not started.
+   */
+  private currentRound(): Choice[] | null {
     if (!this.data) return null;
     const idx = this.data.currentRoundIdx;
     if (idx < 0) return null;
     return this.data.scenario.rounds[idx];
   }
 
-  private redact(round: any) {
-    // Remove correctness flags so clients can’t peek,
-    // but keep points/seconds/ids so host timer works.
+  /**
+   * Remove correctness flags so clients can’t peek,
+   * but keep points/seconds/ids so host timer works.
+   */
+  private redact(round: any): any {
     return {
       ...round,
       choices: (round.choices as Choice[]).map((c) => ({ id: c.id, text: c.text })),
     };
   }
 
-  private publicState() {
+  /**
+   * Return public room state for clients.
+   */
+  private publicState(): any {
     return {
       code: this.data!.code,
       mode: this.data!.mode,
@@ -153,7 +198,11 @@ export class GameRoom implements DurableObject {
   }
 
   // ---- Routes ----
-  private async createRoom(request: Request, code: string) {
+
+  /**
+   * Create a new room or update scenario/mode.
+   */
+  private async createRoom(request: Request, code: string): Promise<Response> {
     const { mode, scenario } = (await request.json().catch(() => ({}))) as {
       mode?: Mode;
       scenario?: Scenario;
@@ -174,7 +223,10 @@ export class GameRoom implements DurableObject {
     return this.json({ ok: true, code, mode: this.data.mode, title: chosenScenario.title });
   }
 
-  private async join(request: Request) {
+  /**
+   * Add a new player to the room.
+   */
+  private async join(request: Request): Promise<Response> {
     const { name } = (await request.json().catch(() => ({}))) as { name?: string };
     if (!name) return this.json({ ok: false, error: "Missing name" }, 400);
 
@@ -184,7 +236,10 @@ export class GameRoom implements DurableObject {
     return this.json({ ok: true, playerId: id, room: this.publicState() });
   }
 
-  private async start() {
+  /**
+   * Start the game (move from lobby to first round).
+   */
+  private async start(): Promise<Response> {
     if (this.data!.phase !== "lobby") return this.json({ ok: false, error: "Already started" }, 400);
     this.data!.phase = "round";
     this.data!.currentRoundIdx = 0;
@@ -193,7 +248,10 @@ export class GameRoom implements DurableObject {
     return this.json({ ok: true, room: this.publicState() });
   }
 
-  private async current() {
+  /**
+   * Get current round info.
+   */
+  private async current(): Promise<Response> {
     const r = this.currentRound();
     return this.json({
       ok: true,
@@ -203,8 +261,11 @@ export class GameRoom implements DurableObject {
     });
   }
 
-  // ★ Hardened: normalize IDs and coerce non-boolean "correct" values
-  private async answer(request: Request) {
+  /**
+   * Submit an answer for the current round.
+   * Hardened: normalize IDs and coerce non-boolean "correct" values.
+   */
+  private async answer(request: Request): Promise<Response> {
     const body = (await request.json().catch(() => ({}))) as {
       playerId?: string;
       choiceId?: string | number;
@@ -227,21 +288,14 @@ export class GameRoom implements DurableObject {
       return this.json({ ok: true, already: true, score: player.score });
     }
 
-    // Normalize helper (tolerate casing/spacing/number IDs in JSON)
-    const norm = (v: unknown) => String(v).trim().toUpperCase();
-    const choiceId = norm(choiceIdRaw);
+    // Use utility normalization function
+    const choiceId = this.norm(choiceIdRaw);
 
     // Find the selected choice robustly
-    const selected = r.choices.find((c: Choice) => norm(c.id) === choiceId);
+    const selected = r.choices.find((c: Choice) => this.norm(c.id) === choiceId);
 
-    // Interpret "correct" that may be boolean/number/string
-    const isTrue = (v: any) =>
-      v === true ||
-      v === 1 ||
-      v === "1" ||
-      (typeof v === "string" && v.trim().toLowerCase() === "true");
-
-    const isCorrect = !!(selected && isTrue((selected as any).correct));
+    // Use utility isTrue function for correctness
+    const isCorrect = !!(selected && this.isTrue((selected as any).correct));
 
     // Record the answer
     player.answered![r.id] = choiceId;
@@ -251,7 +305,10 @@ export class GameRoom implements DurableObject {
     return this.json({ ok: true, correct: isCorrect, score: player.score });
   }
 
-  private async next() {
+  /**
+   * Advance to the next round or results.
+   */
+  private async next(): Promise<Response> {
     if (this.data!.phase !== "round") return this.json({ ok: false, error: "Not in round" }, 400);
 
     const lastIdx = this.data!.scenario.rounds.length - 1;
@@ -266,7 +323,10 @@ export class GameRoom implements DurableObject {
     return this.json({ ok: true, idx: this.data!.currentRoundIdx });
   }
 
-  private async scoreboard() {
+  /**
+   * Get sorted scoreboard.
+   */
+  private async scoreboard(): Promise<Response> {
     const players = Object.values(this.data!.players).sort((a, b) => b.score - a.score);
     return this.json({ ok: true, players });
   }
